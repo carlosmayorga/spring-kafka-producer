@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,5 +45,18 @@ public class LibraryEventsController {
 		log.info("### After invoke Kafka");
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);
+	}
+	
+	
+	@PutMapping("/v1/libraryevent")
+	public ResponseEntity<?> putLibraryEvent(@RequestBody LibraryEvent libraryEvent) throws Exception {
+		
+		if (libraryEvent.getLibraryEventId()==null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please send the Id");
+		}
+		libraryEvent.setLibraryEventType(LibraryEventType.UPDATE);
+		libEventProducer.sendLibraryEvent(libraryEvent);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(libraryEvent);
 	}
 }
